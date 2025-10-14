@@ -1,4 +1,4 @@
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import DashboardClient from "./DashboardClient";
 
@@ -14,20 +14,14 @@ export default async function Dashboard() {
 
   // If not authenticated, redirect to home
   if (!accessToken || !userCookie) {
-    const headersList = await headers();
-    const host = headersList.get("host") || "127.0.0.1:3000";
-    const protocol = "http";
-    redirect(`${protocol}://${host}/?error=not_authenticated`);
+    redirect(`${process.env.BASE_URL}/?error=not_authenticated`);
   }
 
   let user;
   try {
     user = JSON.parse(userCookie);
   } catch (err) {
-    const headersList = await headers();
-    const host = headersList.get("host") || "127.0.0.1:3000";
-    const protocol = "http";
-    redirect(`${protocol}://${host}/?error=invalid_user_data`);
+    redirect(`${process.env.BASE_URL}/?error=invalid_user_data`);
   }
 
   return <DashboardClient user={user} accessToken={accessToken} />;

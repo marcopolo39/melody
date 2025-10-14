@@ -17,21 +17,21 @@ export async function GET(request: NextRequest) {
   // Handle errors from Spotify
   if (error) {
     return NextResponse.redirect(
-      new URL(`http://127.0.0.1:3000/?error=${encodeURIComponent(error)}`)
+      new URL(`${process.env.BASE_URL}/?error=${encodeURIComponent(error)}`)
     );
   }
 
   // Verify state to prevent CSRF attacks
   if (!state || state !== storedState) {
     return NextResponse.redirect(
-      new URL("http://127.0.0.1:3000/?error=state_mismatch")
+      new URL(`${process.env.BASE_URL}/?error=state_mismatch`)
     );
   }
 
   // Exchange code for access token
   if (!code) {
     return NextResponse.redirect(
-      new URL("http://127.0.0.1:3000/?error=missing_code")
+      new URL(`${process.env.BASE_URL}/?error=missing_code`)
     );
   }
 
@@ -47,8 +47,8 @@ export async function GET(request: NextRequest) {
     // Optionally, get user profile
     const profile = await getSpotifyProfile(tokenData.access_token);
 
-    // Create redirect response - force 127.0.0.1 to avoid localhost
-    const dashboardUrl = new URL("http://127.0.0.1:3000/dashboard");
+    // Create redirect response
+    const dashboardUrl = new URL(`${process.env.BASE_URL}/dashboard`);
     const response = NextResponse.redirect(dashboardUrl);
 
     // Store tokens in cookies (httpOnly: false so both server and client can read)
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
     console.error("Error exchanging code for token:", err);
     return NextResponse.redirect(
       new URL(
-        `http://127.0.0.1:3000/?error=${encodeURIComponent(
+        `${process.env.BASE_URL}/?error=${encodeURIComponent(
           "authentication_failed"
         )}`
       )
